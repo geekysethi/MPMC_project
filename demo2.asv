@@ -2,8 +2,13 @@ clc
 clear all
 close all
 imaqreset
+%% creating arduino and servo object
+% a = arduino('com10', 'uno', 'Libraries', 'Servo');
+%   s1 = servo(a, 'D9')
+%   s2 = servo(a, 'D10')
+  
 %% creating video object
-vid=videoinput('winvideo',1);
+vid=videoinput('winvideo',1,'YUY2_640x480');
 set(vid,'ReturnedColorSpace','rgb');
 set(vid,'FramesPerTrigger',1);
 set(vid,'TriggerRepeat',inf);
@@ -63,7 +68,7 @@ for i=1:100
         
         % Apply the transformation to the bounding box points
         bboxPoints = transformPointsForward(xform, bboxPoints);
-                
+        [myX myY]=mycentroid(bboxPoints)
         % Insert a bounding box around the object being tracked
         bboxPolygon = reshape(bboxPoints', 1, []);
         im = insertShape(im, 'Polygon', bboxPolygon, ...
@@ -71,7 +76,8 @@ for i=1:100
                 
         % Display tracked points
         im = insertMarker(im, visiblePoints, '+', ...
-            'Color', 'white');       
+            'Color', 'red');  
+        im =insertMarker(im,[myX,myY]);
         
         % Reset the points
         oldPoints = visiblePoints;
@@ -83,7 +89,6 @@ for i=1:100
     
 end
 % Clean up
-rele
 release(videoPlayer);
 release(pointTracker);
  stop(vid);
